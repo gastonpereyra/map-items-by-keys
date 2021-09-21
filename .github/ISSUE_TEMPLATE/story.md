@@ -1,7 +1,7 @@
 ---
 name: Story
 about: Story to organize development
-title: "[STORY] MIbK -  -"
+title: "[Map Items By Key] - Package -"
 labels: enhancement
 assignees: gastonpereyra
 
