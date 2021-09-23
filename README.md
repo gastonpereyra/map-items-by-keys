@@ -1,58 +1,168 @@
-# Template NPM Packages
+# Map Items by Keys
 
-![npm-template](https://user-images.githubusercontent.com/39351850/89736287-af2cd580-da3e-11ea-86f2-f1829c3fafdf.png)
+## Code Quality Status
+![Build Status](https://github.com/gastonpereyra/map-items-by-keys/workflows/Build%20Status/badge.svg)
+[![Coverage Status](https://img.shields.io/coveralls/github/gastonpereyra/map-items-by-keys/master.svg)](https://coveralls.io/r/gastonpereyra/map-items-by-keys?branch=master)
 
-## :loudspeaker: Description
-This is a template repository to make easier configurate NPM package repositories
+![Map-Items-By-Keys Banner](https://user-images.githubusercontent.com/39351850/94375239-ad9b9780-00e8-11eb-9e8a-dcedbf5418a7.png)
 
-## :floppy_disk: Installation
+## Description
+Create a dictonary-like object from a list of objects using an specfic value from each object.
 
-Steps :walking: :
+## Installation
 
-1. :chestnut: In the *Top-Navbar*, at right corner, on *+*, click **new Repository**
+```
+npm i map-items-by-keys
+```
 
-![New Repository](https://user-images.githubusercontent.com/39351850/89736268-83115480-da3e-11ea-988d-066ce80f88b9.png)
+## mapItemsBy(keys, items, isUnique)
 
-2. :seedling: In *Repository Template*, open menu, click *npm-template*
+### Parameters
 
-![Use Template](https://user-images.githubusercontent.com/39351850/89736261-7ee53700-da3e-11ea-855f-f6ef9162b609.png)
+#### keys
 
-3. :four_leaf_clover: Fill the **Repository Name**
-4. :blossom: Add a **Description**
-5. :bouquet: Click **Create Repository**
+The name of the fields to use as Keys. Can be a Single Key or Multiple ones.
 
-## :white_check_mark: Content
+- Type: _string_ or _Array of string_
+- Example:
+    - `'id'`
+    - `['id', 'name']`
 
-<details>
- <summary><b> :bookmark: NPM - `package.json` </b></summary>
+> :warning: If some item hasn't the field will be ignored
+#### items
 
-* `Mocha` and `Sinon` testings dependencies, and `test` / `test-ci` script
-* `Nyc` coverage dependency, `.nycrc` file and `coverage` script
-* `eslint` and `eslint-airbnb` linter dependencies and `.eslintrc.js` file
-* `root/lib/` as file container
+The list of items to be mapped.
 
-</details>
+- Type: _Array of objects_
+- Example:
 
-<details>
- <summary><b> :bar_chart: Actions Workflows </b></summary>
+```json
+[
+    { "id": 1, "name": "Bruce Wayne", "hero": "Batman" },
+    { "id": 2, "name": "Tony Stark", "hero": "Ironman" }
+]
+```
 
-* Build Status to run tests, on every branches
-* Coverage status to generate Coveralls badge on push and PR
-* Linter status for push and PR
-* NPM publish on releases
+#### isUnique
 
-</details>
+This refers if the values of the keys are unique. This indicate if the final map will save as an array (`false`) or an object (`false`).
 
-<details>
- <summary><b> :scroll: README Template </b></summary>
+- Type: _Boolean_
+- Default: `true`
 
-* Some Block pre-build
-* Build Status and Coverage Status badges
-* Must change `tpl` extension for `md`
+### Examples
 
-</details>
+#### Single and Unique Key
 
-#  :pencil: References
+```js
+const mapItemsBy = require('map-items-by-keys');
 
-* Templates in :us: [Click HERE!!!!!](https://docs.github.com/en/github/managing-your-work-on-github/about-project-boards)
-* Templates en :es: [Click ACA!!!!!](https://docs.github.com/es/github/creating-cloning-and-archiving-repositories/creating-a-template-repository)
+const items = [
+    { id: 1, name: "Bruce Wayne", hero: "Batman" },
+    { id: 2, name: "Tony Stark", hero: "Ironman" }
+]
+
+const itemsMapped = mapItemsBy("id", items);
+
+/*
+output: 
+
+{
+    1: { id: 1, name: "Bruce Wayne", hero: "Batman" },
+    2: { id: 2, name: "Tony Stark", hero: "Ironman" }
+}
+*/
+```
+
+#### Single and not-unique Key
+
+```js
+const mapItemsBy = require('map-items-by-keys');
+
+const items = [
+    { id: 1, name: "Bruce Wayne", hero: "Batman" },
+    { id: 2, name: "Tony Stark", hero: "Ironman" },
+    { id: 3, name: "Richard Grayson", hero: "Batman" }
+]
+
+const itemsMapped = mapItemsBy("hero", items, false);
+
+/*
+output: 
+
+{
+    Batman: [
+        { id: 1, name: Bruce Wayne, hero: "Batman" },
+        { id: 3, name: "Richard Grayson", hero: "Batman" }
+    ],
+    Ironman: [
+        { id: 2, name: Tony Stark, hero: "Ironman" }
+    ]
+}
+*/
+```
+
+#### Multiple and Unique Key
+
+```js
+const mapItemsBy = require('map-items-by-keys');
+
+const items = [
+    { id: 1, name: "Bruce Wayne", hero: "Batman", brand: "DC" },
+    { id: 2, name: "Tony Stark", hero: "Ironman", brand: "Marvel" }
+]
+
+const itemsMapped = mapItemsBy(["brand", "id"], items);
+
+/*
+output: 
+
+{
+    DC: {
+        1: { id: 1, name: "Bruce Wayne", hero: "Batman" }
+    },
+    Marvel: {
+        2: { id: 2, name: "Tony Stark", hero: "Ironman" }
+    }
+}
+*/
+```
+
+#### Multiple and not-unique Key
+
+```js
+const mapItemsBy = require('map-items-by-keys');
+
+const items = [
+    { id: 1, name: "Bruce Wayne", hero: "Batman", brand: "DC" },
+    { id: 2, name: "Tony Stark", hero: "Ironman", brand: "Marvel" },
+    { id: 3, name: "Richard Grayson", hero: "Batman", brand: "DC" }
+]
+
+const itemsMapped = mapItemsBy(["brand", "hero"], items, false);
+
+/*
+output: 
+
+{
+     DC: {
+        Batman: [
+            { id: 1, name: "Bruce Wayne", hero: "Batman" },
+            { id: 3, name: "Richard Grayson", hero: "Batman", brand: "DC" }
+        ]
+    },
+    Marvel: {
+        Ironman: [
+            { id: 2, name: "Tony Stark", hero: "Ironman" }
+        ]
+    }
+}
+*/
+```
+## Bug :bug:
+
+[Report Here](https://github.com/gastonpereyra/map-items-by-keys/issues/new?assignees=gastonpereyra&labels=bug&template=bug.md&title=[BUG])
+
+## Idea :bulb:
+
+[Tell me](https://github.com/gastonpereyra/map-items-by-keys/issues/new?assignees=gastonpereyra&labels=enhancement&title=%5BIDEA%5D+-)
